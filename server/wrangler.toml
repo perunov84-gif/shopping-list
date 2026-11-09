@@ -1,0 +1,7 @@
+name = "shopping-list-ai"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+# Секреты задаются командами (в git не хранятся):
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put APP_TOKEN

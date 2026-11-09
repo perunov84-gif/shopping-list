@@ -45,7 +45,7 @@ class SuggestionStrip extends StatelessWidget {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: suggestions.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (_, i) {
               final s = suggestions[i];
               return Material(

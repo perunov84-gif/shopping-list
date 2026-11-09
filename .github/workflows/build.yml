@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feat/**']
     paths-ignore: ['docs/**', 'server/**', '**.md']
   workflow_dispatch:
 
@@ -55,7 +55,7 @@ jobs:
         run: |
           CACHE="${PUB_CACHE:-$HOME/.pub-cache}/hosted/pub.dev"
           mkdir -p /tmp/ci/pkgs
-          for p in yandex_mobileads flutter_rustore_billing speech_to_text google_mobile_ads in_app_purchase share_plus; do
+          for p in flutter_rustore_pay yandex_mobileads speech_to_text google_mobile_ads in_app_purchase share_plus; do
             d=$(ls -d "$CACHE"/$p-* 2>/dev/null | sort -V | tail -1)
             [ -z "$d" ] && continue
             mkdir -p /tmp/ci/pkgs/$p
@@ -64,17 +64,6 @@ jobs:
             if [ "$p" != "google_mobile_ads" ]; then cp -r "$d"/lib /tmp/ci/pkgs/$p/lib; fi
             cp -r "$d"/android/src/main/AndroidManifest.xml /tmp/ci/pkgs/$p/ 2>/dev/null || true
           done
-
-      - name: Probe RuStore maven (diagnostics)
-        run: |
-          for a in ru/rustore/sdk/billingclient ru/rustore/sdk/pay ru/rustore/sdk/core; do
-            for r in https://artifactory-external.vkpartner.ru/artifactory/maven https://artifactory-external.vkpartner.ru/artifactory/maven-release https://repo.maven.apache.org/maven2; do
-              echo "== $r/$a" >> /tmp/ci/rustore_maven.txt
-              curl -s -m 20 "$r/$a/maven-metadata.xml" | grep -E '<version>|<latest>|<release>' >> /tmp/ci/rustore_maven.txt || echo "(none)" >> /tmp/ci/rustore_maven.txt
-            done
-          done
-          curl -s -m 20 https://pub.dev/api/packages/flutter_rustore_billing | python3 -c 'import sys,json;[print(v["version"], v.get("published")) for v in json.load(sys.stdin)["versions"]]' > /tmp/ci/rustore_versions.txt 2>&1 || true
-          curl -s -m 20 https://pub.dev/api/packages/flutter_rustore_pay > /tmp/ci/rustore_pay_pkg.json 2>&1 || true
 
       - name: Analyze
         run: flutter analyze --no-fatal-infos --no-fatal-warnings > /tmp/ci/analyze.log 2>&1 || true
@@ -99,15 +88,22 @@ jobs:
           fi
 
       - name: Build APK (RuStore / Yandex)
+        env:
+          AI_ENDPOINT: ${{ secrets.AI_ENDPOINT }}
+          AI_APP_TOKEN: ${{ secrets.AI_APP_TOKEN }}
+          RUSTORE_APP_ID: ${{ secrets.RUSTORE_APP_ID }}
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=STORE=rustore --dart-define=TEST_BUILD=true 2>&1 | tee /tmp/ci/build_rustore.log
+          flutter build apk --release --dart-define=STORE=rustore --dart-define=TEST_BUILD=true --dart-define=AI_ENDPOINT="$AI_ENDPOINT" --dart-define=AI_APP_TOKEN="$AI_APP_TOKEN" --dart-define=RUSTORE_APP_ID="$RUSTORE_APP_ID" 2>&1 | tee /tmp/ci/build_rustore.log
           mkdir -p dist && cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-rustore.apk
 
       - name: Build APK (Google Play / AdMob)
+        env:
+          AI_ENDPOINT: ${{ secrets.AI_ENDPOINT }}
+          AI_APP_TOKEN: ${{ secrets.AI_APP_TOKEN }}
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=STORE=gplay --dart-define=TEST_BUILD=true 2>&1 | tee /tmp/ci/build_gplay.log
+          flutter build apk --release --dart-define=STORE=gplay --dart-define=TEST_BUILD=true --dart-define=AI_ENDPOINT="$AI_ENDPOINT" --dart-define=AI_APP_TOKEN="$AI_APP_TOKEN" 2>&1 | tee /tmp/ci/build_gplay.log
           cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-gplay.apk
 
       - uses: actions/upload-artifact@v4
@@ -116,6 +112,7 @@ jobs:
           path: dist/*.apk
 
       - name: Publish release
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
@@ -138,4 +135,4 @@ jobs:
           echo "${{ github.sha }} run ${{ github.run_number }} ${{ job.status }}" > STATUS.txt
           git add -A
           git commit -qm "logs for ${{ github.sha }}"
-          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-logs
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-logs:ci-logs-${{ github.ref_name == 'main' && 'main' || 'feat' }}

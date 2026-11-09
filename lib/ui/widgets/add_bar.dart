@@ -127,7 +127,7 @@ class _AddBarState extends State<AddBar> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             itemCount: _chips.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 6),
+            separatorBuilder: (context, index) => const SizedBox(width: 6),
             itemBuilder: (_, i) => ActionChip(
               label: Text(_chips[i]),
               avatar: Icon(_typing ? Icons.search : Icons.history, size: 16, color: t.colorScheme.primary),
