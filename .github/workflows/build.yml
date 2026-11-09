@@ -65,6 +65,17 @@ jobs:
             cp -r "$d"/android/src/main/AndroidManifest.xml /tmp/ci/pkgs/$p/ 2>/dev/null || true
           done
 
+      - name: Probe RuStore maven (diagnostics)
+        run: |
+          for a in ru/rustore/sdk/billingclient ru/rustore/sdk/pay ru/rustore/sdk/core; do
+            for r in https://artifactory-external.vkpartner.ru/artifactory/maven https://artifactory-external.vkpartner.ru/artifactory/maven-release https://repo.maven.apache.org/maven2; do
+              echo "== $r/$a" >> /tmp/ci/rustore_maven.txt
+              curl -s -m 20 "$r/$a/maven-metadata.xml" | grep -E '<version>|<latest>|<release>' >> /tmp/ci/rustore_maven.txt || echo "(none)" >> /tmp/ci/rustore_maven.txt
+            done
+          done
+          curl -s -m 20 https://pub.dev/api/packages/flutter_rustore_billing | python3 -c 'import sys,json;[print(v["version"], v.get("published")) for v in json.load(sys.stdin)["versions"]]' > /tmp/ci/rustore_versions.txt 2>&1 || true
+          curl -s -m 20 https://pub.dev/api/packages/flutter_rustore_pay > /tmp/ci/rustore_pay_pkg.json 2>&1 || true
+
       - name: Analyze
         run: flutter analyze --no-fatal-infos --no-fatal-warnings > /tmp/ci/analyze.log 2>&1 || true
 
@@ -90,13 +101,13 @@ jobs:
       - name: Build APK (RuStore / Yandex)
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=STORE=rustore 2>&1 | tee /tmp/ci/build_rustore.log
+          flutter build apk --release --dart-define=STORE=rustore --dart-define=TEST_BUILD=true 2>&1 | tee /tmp/ci/build_rustore.log
           mkdir -p dist && cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-rustore.apk
 
       - name: Build APK (Google Play / AdMob)
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=STORE=gplay 2>&1 | tee /tmp/ci/build_gplay.log
+          flutter build apk --release --dart-define=STORE=gplay --dart-define=TEST_BUILD=true 2>&1 | tee /tmp/ci/build_gplay.log
           cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-gplay.apk
 
       - uses: actions/upload-artifact@v4

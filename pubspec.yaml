@@ -4,27 +4,30 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: any
-  sqflite: any
-  path: any
-  shared_preferences: any
-  speech_to_text: any
-  share_plus: any
-  http: any
-  google_mobile_ads: any
-  yandex_mobileads: any
-  in_app_purchase: any
-  flutter_rustore_billing: any
+  provider: ^6.1.5
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  shared_preferences: ^2.5.3
+  speech_to_text: ^7.5.0
+  share_plus: ^13.3.1
+  http: ^1.6.0
+  # Реклама: AdMob (Google Play / App Store) и Яндекс (RuStore)
+  google_mobile_ads: ^9.2.0
+  yandex_mobileads: ^8.6.0
+  # Покупки: Google Play Billing / StoreKit
+  in_app_purchase: ^3.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: any
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/data/catalog.json
