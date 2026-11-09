@@ -1,0 +1,18 @@
+== https://artifactory-external.vkpartner.ru/artifactory/maven/ru/rustore/sdk/billingclient
+(none)
+== https://artifactory-external.vkpartner.ru/artifactory/maven-release/ru/rustore/sdk/billingclient
+(none)
+== https://repo.maven.apache.org/maven2/ru/rustore/sdk/billingclient
+(none)
+== https://artifactory-external.vkpartner.ru/artifactory/maven/ru/rustore/sdk/pay
+(none)
+== https://artifactory-external.vkpartner.ru/artifactory/maven-release/ru/rustore/sdk/pay
+(none)
+== https://repo.maven.apache.org/maven2/ru/rustore/sdk/pay
+(none)
+== https://artifactory-external.vkpartner.ru/artifactory/maven/ru/rustore/sdk/core
+(none)
+== https://artifactory-external.vkpartner.ru/artifactory/maven-release/ru/rustore/sdk/core
+(none)
+== https://repo.maven.apache.org/maven2/ru/rustore/sdk/core
+(none)

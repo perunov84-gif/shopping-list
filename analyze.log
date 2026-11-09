@@ -1,0 +1,8 @@
+Analyzing shopping-list...                                      
+
+   info • 'onReorder' is deprecated and shouldn't be used. Use the onReorderItem callback instead. The onReorderItem callback adjusts the newIndex parameter for a removed item at the oldIndex. This feature was deprecated after v3.41.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/list_screen.dart:287:17 • deprecated_member_use
+   info • Unnecessary use of 'indexOf' to test for containment. Try using 'contains' • lib/ui/list_screen.dart:382:53 • prefer_contains
+   info • Unnecessary use of multiple underscores. Try using '_' • lib/ui/widgets/add_bar.dart:130:35 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores. Try using '_' • lib/ui/widgets/suggestion_strip.dart:48:35 • unnecessary_underscores
+
+4 issues found. (ran in 10.1s)
