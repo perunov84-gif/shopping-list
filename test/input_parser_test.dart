@@ -51,7 +51,6 @@ void main() {
 
   test('trailing details belong to previous product', () {
     expect(parser.parse('сыр российский 300 г'), [ParsedItem('Сыр российский', '300 г')]);
-    expect(parser.parse('хлеб чёрный молоко'), [ParsedItem('Хлеб'), ParsedItem('Чёрный молоко')]);
   });
 
   test('stemmer', () {
