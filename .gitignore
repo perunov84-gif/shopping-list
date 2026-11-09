@@ -1,0 +1,29 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+dist/
+# Android
+android/.gradle/
+android/local.properties
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+**/GeneratedPluginRegistrant.*
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/ephemeral/
+ios/Runner/GeneratedPluginRegistrant.*
+# Misc
+.DS_Store
+server/node_modules/
+server/.dev.vars

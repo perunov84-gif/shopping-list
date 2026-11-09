@@ -1,0 +1,30 @@
+name: shopping_list
+description: "Список покупок — быстрые списки по магазинам с умными подсказками."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: any
+  sqflite: any
+  path: any
+  shared_preferences: any
+  speech_to_text: any
+  share_plus: any
+  http: any
+  google_mobile_ads: any
+  yandex_mobileads: any
+  in_app_purchase: any
+  flutter_rustore_billing: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: any
+
+flutter:
+  uses-material-design: true

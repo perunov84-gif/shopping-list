@@ -1,0 +1,130 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', 'server/**', '**.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare log dir
+        run: mkdir -p /tmp/ci && flutter --version | tee /tmp/ci/flutter_version.txt
+
+      - name: Generate platform folders (first run only)
+        run: |
+          if [ ! -d android ]; then
+            flutter create --org ru.perunov --project-name shopping_list --platforms android,ios . 2>&1 | tee /tmp/ci/create.log
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add android ios .metadata
+            git commit -m "chore: generate Flutter platform folders [skip ci]"
+            git push
+          fi
+
+      - name: Pub get
+        run: |
+          set -o pipefail
+          flutter pub get 2>&1 | tee /tmp/ci/pub_get.log
+          flutter pub deps --style=compact > /tmp/ci/pub_deps.txt 2>&1 || true
+          cp pubspec.lock /tmp/ci/ || true
+
+      - name: Dump plugin APIs (for development)
+        run: |
+          CACHE="${PUB_CACHE:-$HOME/.pub-cache}/hosted/pub.dev"
+          mkdir -p /tmp/ci/pkgs
+          for p in yandex_mobileads flutter_rustore_billing speech_to_text google_mobile_ads in_app_purchase share_plus; do
+            d=$(ls -d "$CACHE"/$p-* 2>/dev/null | sort -V | tail -1)
+            [ -z "$d" ] && continue
+            mkdir -p /tmp/ci/pkgs/$p
+            cp "$d"/README.md "$d"/pubspec.yaml /tmp/ci/pkgs/$p/ 2>/dev/null || true
+            cp -r "$d"/example/lib /tmp/ci/pkgs/$p/example_lib 2>/dev/null || true
+            if [ "$p" != "google_mobile_ads" ]; then cp -r "$d"/lib /tmp/ci/pkgs/$p/lib; fi
+            cp -r "$d"/android/src/main/AndroidManifest.xml /tmp/ci/pkgs/$p/ 2>/dev/null || true
+          done
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings > /tmp/ci/analyze.log 2>&1 || true
+
+      - name: Tests
+        run: flutter test > /tmp/ci/test.log 2>&1 || true
+
+      - name: Configure release signing (optional)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+            printf "storeFile=upload-keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n" \
+              "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
+            echo "Release keystore configured"
+          else
+            echo "No keystore secrets: APK will be signed with the debug key (fine for testing)"
+          fi
+
+      - name: Build APK (RuStore / Yandex)
+        run: |
+          set -o pipefail
+          flutter build apk --release --dart-define=STORE=rustore 2>&1 | tee /tmp/ci/build_rustore.log
+          mkdir -p dist && cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-rustore.apk
+
+      - name: Build APK (Google Play / AdMob)
+        run: |
+          set -o pipefail
+          flutter build apk --release --dart-define=STORE=gplay 2>&1 | tee /tmp/ci/build_gplay.log
+          cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-gplay.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: dist/*.apk
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Сборка ${{ github.run_number }}
+          body: |
+            Автосборка из коммита ${{ github.sha }}.
+            * `shopping-list-rustore.apk` — для RuStore / прямой установки (Яндекс Реклама, оплата RuStore)
+            * `shopping-list-gplay.apk` — для Google Play (AdMob, Google Play Billing)
+          files: dist/*.apk
+          make_latest: true
+
+      - name: Push logs to ci-logs branch
+        if: always()
+        run: |
+          cd /tmp/ci
+          git init -q
+          git checkout -q -b ci-logs
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "${{ github.sha }} run ${{ github.run_number }} ${{ job.status }}" > STATUS.txt
+          git add -A
+          git commit -qm "logs for ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-logs
