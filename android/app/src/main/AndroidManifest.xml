@@ -32,6 +32,13 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Возврат из банковского приложения (СБП, SberPay) после оплаты в RuStore -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="shoppinglistpay"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
@@ -39,6 +46,13 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}"/>
+        <!-- RuStore Pay SDK: код приложения из консоли RuStore (секрет RUSTORE_APP_ID) -->
+        <meta-data
+            android:name="console_app_id_value"
+            android:value="${rustoreAppId}"/>
+        <meta-data
+            android:name="sdk_pay_scheme_value"
+            android:value="shoppinglistpay"/>
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

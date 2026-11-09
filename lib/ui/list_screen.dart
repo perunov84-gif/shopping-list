@@ -284,7 +284,7 @@ class _ListScreenState extends State<ListScreen> {
             : ReorderableListView.builder(
                 padding: const EdgeInsets.only(bottom: 96),
                 itemCount: l.items.length,
-                onReorder: (a, b) => _store.reorder(l, a, b),
+                onReorderItem: (a, b) => _store.reorder(l, a, b),
                 itemBuilder: (_, i) {
                   final item = l.items[i];
                   return Dismissible(
@@ -379,7 +379,7 @@ class _ShopModeBody extends StatelessWidget {
     }
     final sections = groups.keys.toList()
       ..sort((a, b) {
-        int idx(String s) => s == 'Прочее' ? 999 : (order.indexOf(s) < 0 ? 998 : order.indexOf(s));
+        int idx(String s) => s == 'Прочее' ? 999 : (!order.contains(s) ? 998 : order.indexOf(s));
         return idx(a).compareTo(idx(b));
       });
 

@@ -35,6 +35,7 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["rustoreAppId"] = System.getenv("RUSTORE_APP_ID")?.takeIf { it.isNotBlank() } ?: "0"
         manifestPlaceholders["admobAppId"] =
             (project.findProperty("admobAppId") as String?) ?: "ca-app-pub-3940256099942544~3347511713"
     }

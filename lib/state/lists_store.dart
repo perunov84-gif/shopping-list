@@ -159,8 +159,8 @@ class ListsStore extends ChangeNotifier {
   }
 
   Future<void> reorder(ShopList list, int oldIndex, int newIndex) async {
+    // newIndex уже скорректирован (onReorderItem)
     final items = [...list.items];
-    if (newIndex > oldIndex) newIndex -= 1;
     final moved = items.removeAt(oldIndex);
     items.insert(newIndex, moved);
     for (var i = 0; i < items.length; i++) {
