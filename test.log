@@ -1,0 +1,13 @@
+
+::group::✅ Passing tests
+✅ /home/runner/work/shopping-list/shopping-list/test/smoke_test.dart: smoke
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: comma separated with quantities
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: voice phrase without commas
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: adjective is kept
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: unknown product becomes single item
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: multi-word product
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: decimal comma is not a separator
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: stemmer
+::endgroup::
+
+🎉 8 tests passed.
