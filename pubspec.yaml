@@ -21,6 +21,8 @@ dependencies:
   yandex_mobileads: ^8.6.0
   # Покупки: Google Play Billing / StoreKit
   in_app_purchase: ^3.3.1
+  # Покупки: RuStore Pay SDK
+  flutter_rustore_pay: ^11.2.0
 
 dev_dependencies:
   flutter_test:
