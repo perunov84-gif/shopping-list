@@ -35,7 +35,7 @@ class InputParser {
   static const _numberWords = {
     'один': '1', 'одна': '1', 'одну': '1', 'одно': '1', 'два': '2', 'две': '2', 'три': '3', 'четыре': '4',
     'пять': '5', 'шесть': '6', 'семь': '7', 'восемь': '8', 'девять': '9', 'десять': '10',
-    'пара': '2', 'пару': '2', 'полтора': '1,5', 'полторы': '1,5', 'пол': '0,5', 'десяток': '10', 'дюжину': '12',
+    'пара': '2', 'пару': '2', 'полтора': '1,5', 'полторы': '1,5', 'пол': '0,5', 'десяток': '10 шт', 'дюжину': '12 шт',
   };
 
   static const _unitPrefixes = [
@@ -135,7 +135,13 @@ class InputParser {
       return [ParsedItem(capitalize(name), _formatQty(pendingQty))];
     }
     if (pendingWords.isNotEmpty) {
-      items.add(_Draft(capitalize(pendingWords.join(' ')), pendingQty));
+      final last = items.isNotEmpty ? items.last : null;
+      if (last != null && pendingQty.isEmpty) {
+        // «хлеб чёрный» — уточнение после товара относится к нему
+        last.name = '${last.name} ${pendingWords.join(' ').toLowerCase()}';
+      } else {
+        items.add(_Draft(capitalize(pendingWords.join(' ')), pendingQty));
+      }
     }
     return items.map((d) => ParsedItem(d.name, _formatQty(d.qty))).toList();
   }
@@ -143,13 +149,12 @@ class InputParser {
   String _formatQty(List<String> parts) {
     if (parts.isEmpty) return '';
     final s = parts.join(' ');
-    if (s == '10 десяток') return '10 шт';
     return s;
   }
 }
 
 class _Draft {
   _Draft(this.name, this.qty);
-  final String name;
+  String name;
   List<String> qty;
 }
