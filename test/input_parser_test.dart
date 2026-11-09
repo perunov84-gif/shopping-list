@@ -49,6 +49,11 @@ void main() {
     expect(parser.parse('молоко 3,2%'), [ParsedItem('Молоко', '3,2%')]);
   });
 
+  test('trailing details belong to previous product', () {
+    expect(parser.parse('сыр российский 300 г'), [ParsedItem('Сыр российский', '300 г')]);
+    expect(parser.parse('хлеб чёрный молоко'), [ParsedItem('Хлеб'), ParsedItem('Чёрный молоко')]);
+  });
+
   test('stemmer', () {
     expect(stemWord('молока'), stemWord('Молоко'));
     expect(stemWord('гвоздей'), stemWord('гвозди'));

@@ -136,9 +136,10 @@ class InputParser {
     }
     if (pendingWords.isNotEmpty) {
       final last = items.isNotEmpty ? items.last : null;
-      if (last != null && pendingQty.isEmpty) {
-        // «хлеб чёрный» — уточнение после товара относится к нему
+      if (last != null && (pendingQty.isEmpty || last.qty.isEmpty)) {
+        // «хлеб чёрный», «сыр российский 300 г» — уточнение после товара относится к нему
         last.name = '${last.name} ${pendingWords.join(' ').toLowerCase()}';
+        if (last.qty.isEmpty) last.qty = pendingQty;
       } else {
         items.add(_Draft(capitalize(pendingWords.join(' ')), pendingQty));
       }
