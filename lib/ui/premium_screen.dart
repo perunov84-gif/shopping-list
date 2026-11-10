@@ -27,7 +27,6 @@ class PremiumScreen extends StatelessWidget {
         Text('Одна покупка — без подписок', textAlign: TextAlign.center, style: t.textTheme.bodyMedium),
         const SizedBox(height: 16),
         benefit(Icons.block, 'Без рекламы', 'Никаких баннеров и всплывающей рекламы'),
-        benefit(Icons.psychology_alt_outlined, 'Умный облачный ассистент', 'Подсказки ИИ для любых, даже необычных покупок'),
         benefit(Icons.favorite_outline, 'Поддержка разработки', 'Помогаете приложению развиваться'),
         const SizedBox(height: 24),
         if (!p.isVip) ...[

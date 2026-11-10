@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../ai/suggestion.dart';
-import '../ai/suggestion_engine.dart';
+import '../suggestions/suggestion.dart';
+import '../suggestions/suggestion_engine.dart';
 import '../data/catalog.dart';
 import '../models/list_item.dart';
 import '../models/shop_list.dart';
@@ -69,16 +69,9 @@ class _ListScreenState extends State<ListScreen> {
       if (_suggestions.isNotEmpty) setState(() => _suggestions = const []);
       return;
     }
-    final engine = context.read<SuggestionEngine>();
-    final premium = context.read<Premium>();
-    final local = await engine.local(l);
+    final local = await context.read<SuggestionEngine>().local(l);
     if (!mounted) return;
     setState(() => _suggestions = local);
-    // Облачный уровень — только VIP, только если сервер настроен; дополняет локальные подсказки.
-    final cloud = await engine.cloudSuggestions(l, enabled: premium.isVip && settings.cloudAiEnabled);
-    if (!mounted || cloud.isEmpty) return;
-    final have = _suggestions.map((s) => normalizeKey(s.name)).toSet();
-    setState(() => _suggestions = [..._suggestions, ...cloud.where((s) => have.add(normalizeKey(s.name)))]);
   }
 
   Future<void> _acceptSuggestion(ShopList l, Suggestion s) async {
@@ -88,6 +81,10 @@ class _ListScreenState extends State<ListScreen> {
 
   void _dismissSuggestion(ShopList l, Suggestion s) {
     context.read<SuggestionEngine>().dismiss(l.id, s.name);
+    _store.forgetSuggestion(l, s.name);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('«${s.name}» больше не будет предлагаться')));
     setState(() => _suggestions = _suggestions.where((x) => x != s).toList());
   }
 

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../data/catalog.dart';
 import '../models/shop_list.dart';
 import '../monetization/ads.dart';
 import '../monetization/premium.dart';
+import '../services/backup_service.dart';
 import '../services/voice_router.dart';
 import '../state/lists_store.dart';
 import 'list_screen.dart';
@@ -46,6 +48,20 @@ class HomeScreen extends StatelessWidget {
     ));
   }
 
+  /// Список, которым поделились текстом (мессенджер, заметки), — из буфера обмена.
+  Future<void> _pasteList(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text ?? '';
+    if (!context.mounted) return;
+    if (text.trim().isEmpty) {
+      messenger.showSnackBar(const SnackBar(content: Text('Скопируйте список (например, из мессенджера) и повторите')));
+      return;
+    }
+    final n = await BackupService(context.read<ListsStore>()).importText(text);
+    messenger.showSnackBar(SnackBar(content: Text(n == 0 ? 'В буфере нет товаров' : 'Создан список: $n поз.')));
+  }
+
   @override
   Widget build(BuildContext context) {
     final store = context.watch<ListsStore>();
@@ -61,6 +77,11 @@ class HomeScreen extends StatelessWidget {
               icon: const Icon(Icons.workspace_premium_outlined),
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen())),
             ),
+          IconButton(
+            tooltip: 'Вставить список из буфера',
+            icon: const Icon(Icons.content_paste_go),
+            onPressed: () => _pasteList(context),
+          ),
           IconButton(
             tooltip: 'Настройки',
             icon: const Icon(Icons.settings_outlined),

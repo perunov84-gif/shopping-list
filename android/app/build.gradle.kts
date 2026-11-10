@@ -55,6 +55,7 @@ android {
         release {
             // Без секретов подписываем debug-ключом — такую сборку можно ставить для проверки,
             // но публиковать в магазины нужно только с release-ключом.
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = if (hasReleaseKey) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }

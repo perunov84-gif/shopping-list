@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'ai/cloud_suggestions.dart';
-import 'ai/suggestion_engine.dart';
+import 'suggestions/suggestion_engine.dart';
 import 'data/catalog.dart';
 import 'data/database.dart';
 import 'data/list_repository.dart';
@@ -27,7 +26,7 @@ Future<void> main() async {
   await lists.load();
   final premium = Premium(settings);
   final ads = AdsService(settings, premium);
-  final engine = SuggestionEngine(catalog: catalog, repo: repo, cloud: CloudSuggestionClient());
+  final engine = SuggestionEngine(catalog: catalog, repo: repo);
 
   runApp(MultiProvider(
     providers: [

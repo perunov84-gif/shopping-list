@@ -15,12 +15,13 @@ dependencies:
   shared_preferences: ^2.5.3
   speech_to_text: ^7.5.0
   share_plus: ^13.3.1
-  http: ^1.6.0
   # Реклама: AdMob (Google Play / App Store) и Яндекс (RuStore)
   google_mobile_ads: ^9.2.0
   yandex_mobileads: ^8.6.0
   # Покупки: Google Play Billing / StoreKit
   in_app_purchase: ^3.3.1
+  # Резервная копия: выбор файла для импорта
+  file_picker: any
   # Покупки: RuStore Pay SDK
   flutter_rustore_pay: ^11.2.0
 

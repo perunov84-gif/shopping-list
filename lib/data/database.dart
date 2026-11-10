@@ -12,7 +12,7 @@ class AppDatabase {
   AppDatabase._(this.db);
 
   final Database db;
-  static const _version = 1;
+  static const _version = 2;
 
   static Future<AppDatabase> open({String? path}) async {
     final dbPath = path ?? p.join(await getDatabasesPath(), 'shopping_list.db');
@@ -56,10 +56,21 @@ class AppDatabase {
             count INTEGER NOT NULL DEFAULT 0,
             PRIMARY KEY(a, b, category)
           )''');
+        await _createHidden(db);
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) await _createHidden(db);
       },
       onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
-      // onUpgrade: миграции будущих версий схемы добавлять сюда.
     );
     return AppDatabase._(db);
   }
+
+  /// v2: товары, которые пользователь убрал из подсказок.
+  static Future<void> _createHidden(Database db) => db.execute('''
+        CREATE TABLE IF NOT EXISTS hidden(
+          key TEXT NOT NULL,
+          category TEXT NOT NULL,
+          PRIMARY KEY(key, category)
+        )''');
 }

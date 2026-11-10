@@ -8,7 +8,7 @@ import 'purchase_backend.dart';
 import 'purchase_backend_play.dart';
 import 'purchase_backend_rustore.dart';
 
-/// Статус VIP. VIP = разовая покупка: без рекламы + облачный ИИ-ассистент.
+/// Статус VIP. VIP = разовая покупка: отключает рекламу навсегда.
 class Premium extends ChangeNotifier {
   Premium(this._settings) : _isVip = _settings.vipCached {
     _backend = AppConfig.isRuStore ? RuStorePurchaseBackend() : PlayPurchaseBackend();

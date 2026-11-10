@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [main, 'feat/**']
-    paths-ignore: ['docs/**', 'server/**', '**.md']
+    paths-ignore: ['docs/**', '**.md']
   workflow_dispatch:
 
 permissions:
@@ -89,21 +89,16 @@ jobs:
 
       - name: Build APK (RuStore / Yandex)
         env:
-          AI_ENDPOINT: ${{ secrets.AI_ENDPOINT }}
-          AI_APP_TOKEN: ${{ secrets.AI_APP_TOKEN }}
           RUSTORE_APP_ID: ${{ secrets.RUSTORE_APP_ID }}
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=STORE=rustore --dart-define=TEST_BUILD=true --dart-define=AI_ENDPOINT="$AI_ENDPOINT" --dart-define=AI_APP_TOKEN="$AI_APP_TOKEN" --dart-define=RUSTORE_APP_ID="$RUSTORE_APP_ID" 2>&1 | tee /tmp/ci/build_rustore.log
+          flutter build apk --release --dart-define=STORE=rustore --dart-define=TEST_BUILD=true --dart-define=RUSTORE_APP_ID="$RUSTORE_APP_ID" 2>&1 | tee /tmp/ci/build_rustore.log
           mkdir -p dist && cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-rustore.apk
 
       - name: Build APK (Google Play / AdMob)
-        env:
-          AI_ENDPOINT: ${{ secrets.AI_ENDPOINT }}
-          AI_APP_TOKEN: ${{ secrets.AI_APP_TOKEN }}
         run: |
           set -o pipefail
-          flutter build apk --release --dart-define=STORE=gplay --dart-define=TEST_BUILD=true --dart-define=AI_ENDPOINT="$AI_ENDPOINT" --dart-define=AI_APP_TOKEN="$AI_APP_TOKEN" 2>&1 | tee /tmp/ci/build_gplay.log
+          flutter build apk --release --dart-define=STORE=gplay --dart-define=TEST_BUILD=true 2>&1 | tee /tmp/ci/build_gplay.log
           cp build/app/outputs/flutter-apk/app-release.apk dist/shopping-list-gplay.apk
 
       - name: Enable KVM

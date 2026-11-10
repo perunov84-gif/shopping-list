@@ -87,6 +87,17 @@ class _AddBarState extends State<AddBar> {
     await _loadFrequent();
   }
 
+  /// Долгое нажатие на подсказку — больше не предлагать этот товар.
+  Future<void> _forget(String name) async {
+    HapticFeedback.mediumImpact();
+    await _store.forgetSuggestion(widget.list, name);
+    if (!mounted) return;
+    setState(() => _chips = _chips.where((c) => c != name).toList());
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('«$name» больше не будет предлагаться')));
+  }
+
   Future<void> _voice() async {
     final text = await showVoiceSheet(context, hint: 'Например: «два литра молока, хлеб и десяток яиц»');
     if (text == null || text.trim().isEmpty || !mounted) return;
@@ -128,11 +139,14 @@ class _AddBarState extends State<AddBar> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             itemCount: _chips.length,
             separatorBuilder: (context, index) => const SizedBox(width: 6),
-            itemBuilder: (_, i) => ActionChip(
-              label: Text(_chips[i]),
-              avatar: Icon(_typing ? Icons.search : Icons.history, size: 16, color: t.colorScheme.primary),
-              onPressed: () => _pickChip(_chips[i]),
-              visualDensity: VisualDensity.compact,
+            itemBuilder: (_, i) => GestureDetector(
+              onLongPress: () => _forget(_chips[i]),
+              child: ActionChip(
+                label: Text(_chips[i]),
+                avatar: Icon(_typing ? Icons.search : Icons.history, size: 16, color: t.colorScheme.primary),
+                onPressed: () => _pickChip(_chips[i]),
+                visualDensity: VisualDensity.compact,
+              ),
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-enum SuggestionSource { rules, history, cloud }
+enum SuggestionSource { rules, history }
 
 class Suggestion {
   Suggestion({required this.name, required this.reason, required this.score, required this.source});

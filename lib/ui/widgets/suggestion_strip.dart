@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../ai/suggestion.dart';
+import '../../suggestions/suggestion.dart';
 
 /// Ненавязчивая лента подсказок ассистента. Касание — добавить, долгое нажатие — «не предлагать».
 class SuggestionStrip extends StatelessWidget {
@@ -58,7 +58,7 @@ class SuggestionStrip extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(s.source == SuggestionSource.cloud ? Icons.psychology_alt_outlined : Icons.add_circle_outline,
+                      Icon(Icons.add_circle_outline,
                           size: 18, color: t.colorScheme.primary),
                       const SizedBox(width: 6),
                       Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [

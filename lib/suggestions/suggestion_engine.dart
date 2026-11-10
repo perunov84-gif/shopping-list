@@ -1,28 +1,21 @@
-import 'dart:async';
-
 import '../data/catalog.dart';
 import '../data/list_repository.dart';
 import '../models/list_item.dart';
 import '../models/shop_list.dart';
-import 'cloud_suggestions.dart';
 import 'suggestion.dart';
 
-/// Ассистент «не забыть купить».
-///
-/// Три уровня, от быстрого к умному:
-///  1. Правила из встроенной базы (гвозди → молоток) — мгновенно и офлайн.
+/// Подсказки «не забыть купить». Без ИИ и без сети — полностью на устройстве:
+///  1. Правила из встроенной базы (гвозди → молоток).
 ///  2. Память пользователя: что он сам обычно покупает вместе и часто.
-///  3. (VIP, опционально) облачная LLM через ваш сервер — для редких/необычных сочетаний.
 ///
 /// Ненавязчивость обеспечивает UI: подсказки показываются небольшой лентой
 /// только когда в списке есть хотя бы [minItemsToSuggest] позиции, их можно скрыть,
 /// а отклонённые подсказки больше не повторяются в этом списке.
 class SuggestionEngine {
-  SuggestionEngine({required this.catalog, required this.repo, this.cloud});
+  SuggestionEngine({required this.catalog, required this.repo});
 
   final Catalog catalog;
   final ListRepository repo;
-  CloudSuggestionClient? cloud;
 
   static const minItemsToSuggest = 1;
   static const maxSuggestions = 8;
@@ -35,7 +28,10 @@ class SuggestionEngine {
   Future<List<Suggestion>> local(ShopList list) async {
     final present = list.items.map((i) => i.key).toSet();
     if (present.length < minItemsToSuggest) return const [];
-    final dismissed = _dismissed[list.id] ?? const <String>{};
+    final dismissed = {..._dismissed[list.id] ?? const <String>{}};
+    try {
+      dismissed.addAll(await repo.hidden(list.category));
+    } catch (_) {}
     final scores = <String, Suggestion>{};
 
     void add(String name, String reason, double score, SuggestionSource source) {
@@ -91,17 +87,5 @@ class SuggestionEngine {
     final cat = catalog.categoryOf(key);
     if (cat == null) return const [];
     return catalog.of(cat).related[key] ?? const [];
-  }
-
-  /// Облачные подсказки (только VIP и только если настроен сервер). Не бросает исключений.
-  Future<List<Suggestion>> cloudSuggestions(ShopList list, {required bool enabled}) async {
-    final c = cloud;
-    if (!enabled || c == null || !c.isConfigured || list.items.length < 2) return const [];
-    final present = list.items.map((i) => i.key).toSet();
-    final dismissed = _dismissed[list.id] ?? const <String>{};
-    final res = await c.suggest(category: list.category.title, items: list.items.map((i) => i.name).toList());
-    return res
-        .where((s) => !present.contains(normalizeKey(s.name)) && !dismissed.contains(normalizeKey(s.name)))
-        .toList();
   }
 }

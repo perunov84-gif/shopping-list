@@ -80,6 +80,7 @@ class ListRepository {
   Future<void> recordPurchase(String name, StoreCategory category, Iterable<String> others) async {
     final key = normalizeKey(name);
     final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.delete('hidden', where: 'key = ? AND category = ?', whereArgs: [key, category.key]);
     await _db.rawInsert(
       'INSERT INTO history(key, category, name, count, last_used) VALUES(?, ?, ?, 1, ?) '
       'ON CONFLICT(key, category) DO UPDATE SET count = count + 1, last_used = excluded.last_used, name = excluded.name',
@@ -123,8 +124,22 @@ class ListRepository {
     return {for (final r in rows) r['b'] as String: (r['c'] as num).toInt()};
   }
 
+  /// Убрать товар из подсказок (пользователь больше не хочет его видеть).
+  Future<void> forget(String name, StoreCategory category) async {
+    final key = normalizeKey(name);
+    await _db.delete('history', where: 'key = ? AND category = ?', whereArgs: [key, category.key]);
+    await _db.delete('pairs', where: '(a = ? OR b = ?) AND category = ?', whereArgs: [key, key, category.key]);
+    await _db.insert('hidden', {'key': key, 'category': category.key}, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
+  Future<Set<String>> hidden(StoreCategory category) async {
+    final rows = await _db.query('hidden', where: 'category = ?', whereArgs: [category.key]);
+    return rows.map((r) => r['key'] as String).toSet();
+  }
+
   Future<void> clearMemory() async {
     await _db.delete('history');
     await _db.delete('pairs');
+    await _db.delete('hidden');
   }
 }

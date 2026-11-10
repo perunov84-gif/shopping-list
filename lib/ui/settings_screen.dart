@@ -1,9 +1,12 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../app_config.dart';
 import '../monetization/premium.dart';
+import '../services/backup_service.dart';
 import '../state/lists_store.dart';
 import '../state/settings_store.dart';
 import 'premium_screen.dart';
@@ -17,6 +20,30 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   int _taps = 0;
+
+  Future<void> _export() async {
+    final bytes = BackupService(context.read<ListsStore>()).exportJson();
+    final date = DateTime.now().toIso8601String().substring(0, 10);
+    await SharePlus.instance.share(ShareParams(
+      files: [XFile.fromData(bytes, mimeType: 'application/json', name: 'shopping-lists-$date.json')],
+      fileNameOverrides: ['shopping-lists-$date.json'],
+      subject: 'Резервная копия списков покупок',
+    ));
+  }
+
+  Future<void> _import() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final backup = BackupService(context.read<ListsStore>());
+    try {
+      final res = await FilePicker.platform.pickFiles(type: FileType.any, withData: true);
+      final bytes = res?.files.single.bytes;
+      if (bytes == null) return;
+      final n = await backup.importJson(bytes);
+      messenger.showSnackBar(SnackBar(content: Text('Восстановлено списков: $n')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Не удалось восстановить: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen())),
           ),
         ),
-        const _Header('Ассистент'),
+        const _Header('Подсказки'),
         SwitchListTile(
           secondary: const Icon(Icons.auto_awesome),
           title: const Text('Подсказки «не забыть купить»'),
@@ -43,17 +70,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           value: s.suggestionsEnabled,
           onChanged: (v) => s.suggestionsEnabled = v,
         ),
-        SwitchListTile(
-          secondary: const Icon(Icons.psychology_alt_outlined),
-          title: const Text('Облачный ИИ (VIP)'),
-          subtitle: const Text('Состав списка отправляется на сервер для подсказок'),
-          value: p.isVip && s.cloudAiEnabled,
-          onChanged: p.isVip ? (v) => s.cloudAiEnabled = v : null,
-        ),
         ListTile(
           leading: const Icon(Icons.delete_sweep_outlined),
           title: const Text('Очистить историю покупок'),
-          subtitle: const Text('Ассистент забудет ваши привычки'),
+          subtitle: const Text('Подсказки и «частые товары» начнутся с нуля'),
           onTap: () async {
             final ok = await showDialog<bool>(
               context: context,
@@ -73,6 +93,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
             }
           },
+        ),
+        const _Header('Резервная копия'),
+        ListTile(
+          leading: const Icon(Icons.upload_file_outlined),
+          title: const Text('Сохранить все списки в файл'),
+          subtitle: const Text('Для переноса на новый телефон'),
+          onTap: _export,
+        ),
+        ListTile(
+          leading: const Icon(Icons.download_outlined),
+          title: const Text('Восстановить из файла'),
+          subtitle: const Text('Списки добавятся к текущим'),
+          onTap: _import,
         ),
         const _Header('О приложении'),
         ListTile(

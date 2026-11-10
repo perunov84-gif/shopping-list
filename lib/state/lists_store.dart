@@ -196,7 +196,7 @@ class ListsStore extends ChangeNotifier {
   Future<List<String>> autocomplete(ShopList list, String query) async {
     final q = normalizeKey(query);
     if (q.isEmpty) return const [];
-    final present = list.items.map((i) => i.key).toSet();
+    final present = {...list.items.map((i) => i.key), ...await repo.hidden(list.category)};
     final hist = await repo.history(list.category, limit: 300);
     final fromHistory = hist.map((h) => h.name).where((n) => normalizeKey(n).contains(q));
     final fromCatalog = catalog.search(list.category, query, limit: 12);
@@ -209,7 +209,7 @@ class ListsStore extends ChangeNotifier {
 
   /// «Частые» товары для быстрых чипов при пустом поле ввода.
   Future<List<String>> frequent(ShopList list, {int limit = 12}) async {
-    final present = list.items.map((i) => i.key).toSet();
+    final present = {...list.items.map((i) => i.key), ...await repo.hidden(list.category)};
     final hist = await repo.history(list.category, limit: 40);
     final names = hist.where((h) => !present.contains(normalizeKey(h.name))).map((h) => h.name).toList();
     if (names.length < limit) {
@@ -228,4 +228,6 @@ class ListsStore extends ChangeNotifier {
       catalog.of(c).names.firstWhere((n) => normalizeKey(n) == key, orElse: () => capitalize(key));
 
   Future<void> clearMemory() => repo.clearMemory();
+
+  Future<void> forgetSuggestion(ShopList list, String name) => repo.forget(name, list.category);
 }

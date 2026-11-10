@@ -18,12 +18,6 @@ class SettingsStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get cloudAiEnabled => _prefs.getBool('cloud_ai') ?? true;
-  set cloudAiEnabled(bool v) {
-    _prefs.setBool('cloud_ai', v);
-    notifyListeners();
-  }
-
   bool get onboardingDone => _prefs.getBool('onboarding_done') ?? false;
   set onboardingDone(bool v) {
     _prefs.setBool('onboarding_done', v);

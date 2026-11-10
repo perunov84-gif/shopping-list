@@ -5,6 +5,8 @@ OUT=/tmp/ci/smoke
 mkdir -p "$OUT"
 PKG=ru.perunov.shopping_list
 adb wait-for-device
+SIZE=$(adb shell wm size | grep -oE '[0-9]+x[0-9]+' | tail -1); W=${SIZE%x*}; H=${SIZE#*x}
+tap() { adb shell input tap $(( W * $1 / 100 )) $(( H * $2 / 100 )); sleep 3; }
 for apk in dist/shopping-list-gplay.apk dist/shopping-list-rustore.apk; do
   name=$(basename "$apk" .apk)
   adb uninstall "$PKG" >/dev/null 2>&1 || true
@@ -12,13 +14,15 @@ for apk in dist/shopping-list-gplay.apk dist/shopping-list-rustore.apk; do
   adb logcat -c
   adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null 2>&1
   sleep 25
-  adb exec-out screencap -p > "$OUT/$name-start.png"
-  # простой сценарий: создать список «Продукты»
-  adb shell input tap 540 1300 >/dev/null 2>&1
-  sleep 3
-  adb exec-out screencap -p > "$OUT/$name-step2.png"
+  adb exec-out screencap -p > "$OUT/$name-1-start.png"
+  tap 50 62                      # «Создать список»
+  adb exec-out screencap -p > "$OUT/$name-2-sheet.png"
+  tap 20 52                      # плитка «Продукты»
+  adb shell input text "moloko,hleb"; adb shell input keyevent 66; sleep 3
+  adb exec-out screencap -p > "$OUT/$name-3-list.png"
   adb shell pidof "$PKG" > "$OUT/$name-pid.txt" 2>&1 || echo "NOT RUNNING" > "$OUT/$name-pid.txt"
   adb logcat -d -v brief > "$OUT/$name-logcat-full.txt" 2>&1
-  grep -E "AndroidRuntime|FATAL|flutter|E/|Exception" "$OUT/$name-logcat-full.txt" | grep -v -E "^W/" | head -400 > "$OUT/$name-errors.txt"
+  grep -n "FATAL EXCEPTION" -A40 "$OUT/$name-logcat-full.txt" > "$OUT/$name-crash.txt" || true
+  grep -E "E/flutter|I/flutter" "$OUT/$name-logcat-full.txt" > "$OUT/$name-flutter.txt" || true
 done
 exit 0
