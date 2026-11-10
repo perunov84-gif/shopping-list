@@ -13,6 +13,7 @@ for apk in dist/shopping-list-gplay.apk dist/shopping-list-rustore.apk; do
   adb install -r -g "$apk" > "$OUT/$name-install.txt" 2>&1
   adb logcat -c
   adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null 2>&1
+  sleep 0.6; adb exec-out screencap -p > "$OUT/$name-0-splash.png"
   sleep 25
   adb exec-out screencap -p > "$OUT/$name-1-start.png"
   tap 50 70                      # «Создать список»
