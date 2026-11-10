@@ -246,10 +246,10 @@ class _ListScreenState extends State<ListScreen> {
                 onPressed: () => showShareSheet(context, l),
               ),
             if (_shopMode)
-              TextButton.icon(
+              IconButton(
+                tooltip: 'Изменить список',
                 onPressed: () => setState(() => _shopMode = false),
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Изменить'),
               ),
             PopupMenuButton<String>(
               onSelected: (a) => _menu(l, a),
