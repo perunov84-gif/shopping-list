@@ -18,6 +18,13 @@ class SettingsStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Тема оформления: светлая по умолчанию.
+  bool get darkTheme => _prefs.getBool('dark_theme') ?? false;
+  set darkTheme(bool v) {
+    _prefs.setBool('dark_theme', v);
+    notifyListeners();
+  }
+
   bool get onboardingDone => _prefs.getBool('onboarding_done') ?? false;
   set onboardingDone(bool v) {
     _prefs.setBool('onboarding_done', v);

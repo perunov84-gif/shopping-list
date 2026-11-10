@@ -6,6 +6,7 @@ import '../models/list_item.dart';
 import '../models/shop_list.dart';
 import '../models/store_category.dart';
 import '../services/input_parser.dart';
+import '../services/share_link.dart';
 
 /// Состояние всех списков. Данные небольшие, поэтому держим их в памяти целиком
 /// и синхронно отражаем изменения в SQLite.
@@ -228,6 +229,58 @@ class ListsStore extends ChangeNotifier {
       catalog.of(c).names.firstWhere((n) => normalizeKey(n) == key, orElse: () => capitalize(key));
 
   Future<void> clearMemory() => repo.clearMemory();
+
+  // ---------- Обмен ссылкой ----------
+
+  /// Ссылка на список для отправки в мессенджер.
+  Future<String> shareLink(ShopList list) async {
+    if (list.shareId == null) {
+      list.shareId = ShareLink.newShareId();
+      await repo.updateList(list);
+    }
+    return ShareLink.build(list, list.shareId!);
+  }
+
+  /// Принять присланный список. Если этот список уже приходил раньше — обновить его:
+  /// новые позиции добавятся, убранные исчезнут, галочки у оставшихся сохранятся.
+  Future<ShopList> receiveShared(SharedList s) async {
+    ShopList? list;
+    if (s.shareId.isNotEmpty) {
+      for (final l in _lists) {
+        if (l.shareId == s.shareId) list = l;
+      }
+    }
+    if (list == null) {
+      list = await createList(s.category, name: s.name);
+      list.shareId = s.shareId.isEmpty ? ShareLink.newShareId() : s.shareId;
+      await repo.updateList(list);
+    } else {
+      list.name = s.name;
+      final keep = {for (final i in s.items) normalizeKey(i.name)};
+      for (final old in [...list.items]) {
+        if (!keep.contains(old.key)) {
+          list.items.remove(old);
+          await repo.deleteItem(old.id);
+        }
+      }
+      _touch(list);
+      await repo.updateList(list);
+    }
+    for (final i in s.items) {
+      final existing = list.items.where((x) => x.key == normalizeKey(i.name));
+      if (existing.isNotEmpty) {
+        final e = existing.first;
+        if (e.quantity != i.quantity) {
+          e.quantity = i.quantity;
+          await repo.updateItem(e);
+        }
+        continue;
+      }
+      await _insert(list, capitalize(i.name.trim()), i.quantity, record: false);
+    }
+    notifyListeners();
+    return list;
+  }
 
   Future<void> forgetSuggestion(ShopList list, String name) => repo.forget(name, list.category);
 }

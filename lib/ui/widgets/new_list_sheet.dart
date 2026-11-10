@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/shop_list.dart';
 import '../../models/store_category.dart';
 import '../../state/lists_store.dart';
+import '../theme.dart';
 
 /// Создание списка в два касания: выбрать тип магазина — список сразу открыт.
 Future<ShopList?> showNewListSheet(BuildContext context) {
@@ -112,7 +113,7 @@ class _CategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = category.color;
+    final c = category.tint(context);
     return Material(
       color: c.withValues(alpha: selected ? 0.28 : 0.12),
       borderRadius: BorderRadius.circular(16),

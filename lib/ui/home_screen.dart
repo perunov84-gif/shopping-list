@@ -12,7 +12,9 @@ import '../state/lists_store.dart';
 import 'list_screen.dart';
 import 'premium_screen.dart';
 import 'settings_screen.dart';
+import 'theme.dart';
 import 'widgets/new_list_sheet.dart';
+import 'widgets/share_sheet.dart';
 import 'widgets/voice_sheet.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -171,6 +173,7 @@ class _ListCard extends StatelessWidget {
       showDragHandle: true,
       builder: (ctx) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ListTile(leading: const Icon(Icons.send_outlined), title: const Text('Отправить список'), subtitle: const Text('Ссылкой в Telegram, WhatsApp…'), onTap: () => Navigator.pop(ctx, 'share')),
           ListTile(leading: const Icon(Icons.edit_outlined), title: const Text('Переименовать'), onTap: () => Navigator.pop(ctx, 'rename')),
           ListTile(leading: const Icon(Icons.copy_outlined), title: const Text('Повторить список'), subtitle: const Text('Копия без галочек'), onTap: () => Navigator.pop(ctx, 'dup')),
           ListTile(
@@ -182,6 +185,8 @@ class _ListCard extends StatelessWidget {
     );
     if (!context.mounted) return;
     switch (action) {
+      case 'share':
+        await showShareSheet(context, list);
       case 'rename':
         await showEditListSheet(context, list);
       case 'dup':
@@ -206,6 +211,7 @@ class _ListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final c = list.category;
+    final tint = c.tint(context);
     final subtitle = list.total == 0
         ? 'Пустой список'
         : list.isDone
@@ -221,8 +227,8 @@ class _ListCard extends StatelessWidget {
           child: Row(children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: c.color.withValues(alpha: 0.15),
-              child: Icon(c.icon, color: c.color),
+              backgroundColor: tint.withValues(alpha: 0.15),
+              child: Icon(c.icon, color: tint),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -234,7 +240,7 @@ class _ListCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(value: list.progress, minHeight: 5, color: c.color, backgroundColor: c.color.withValues(alpha: 0.12)),
+                    child: LinearProgressIndicator(value: list.progress, minHeight: 5, color: tint, backgroundColor: tint.withValues(alpha: 0.12)),
                   ),
                 ],
               ]),

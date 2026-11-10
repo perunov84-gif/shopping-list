@@ -8,6 +8,7 @@ class ShopList {
     required this.category,
     required this.createdAt,
     required this.updatedAt,
+    this.shareId,
     List<ListItem>? items,
   }) : items = items ?? [];
 
@@ -16,6 +17,10 @@ class ShopList {
   StoreCategory category;
   final DateTime createdAt;
   DateTime updatedAt;
+
+  /// Идентификатор для обмена ссылкой: одинаковый у отправителя и получателя,
+  /// поэтому повторно присланный список обновляется, а не дублируется.
+  String? shareId;
   final List<ListItem> items;
 
   int get total => items.length;
@@ -29,6 +34,7 @@ class ShopList {
         'category': category.key,
         'created_at': createdAt.millisecondsSinceEpoch,
         'updated_at': updatedAt.millisecondsSinceEpoch,
+        'share_id': shareId,
       };
 
   factory ShopList.fromMap(Map<String, Object?> m) => ShopList(
@@ -37,6 +43,7 @@ class ShopList {
         category: StoreCategory.fromKey(m['category'] as String?),
         createdAt: DateTime.fromMillisecondsSinceEpoch(m['created_at'] as int),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(m['updated_at'] as int),
+        shareId: m['share_id'] as String?,
       );
 
   /// Текстовое представление для «Поделиться».

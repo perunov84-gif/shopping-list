@@ -32,6 +32,13 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Присланный список: shoppinglist://list?d=… (открывается со страницы-ссылки) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="shoppinglist" android:host="list"/>
+            </intent-filter>
             <!-- Возврат из банковского приложения (СБП, SberPay) после оплаты в RuStore -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -53,6 +60,8 @@
         <meta-data
             android:name="sdk_pay_scheme_value"
             android:value="shoppinglistpay"/>
+        <!-- Ссылки обрабатывает app_links, а не встроенный роутер Flutter -->
+        <meta-data android:name="flutter_deeplinking_enabled" android:value="false"/>
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

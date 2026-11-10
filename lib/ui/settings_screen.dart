@@ -62,6 +62,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen())),
           ),
         ),
+        const _Header('Оформление'),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(value: false, icon: Icon(Icons.light_mode_outlined), label: Text('Светлая')),
+              ButtonSegment(value: true, icon: Icon(Icons.dark_mode_outlined), label: Text('Тёмная')),
+            ],
+            selected: {s.darkTheme},
+            onSelectionChanged: (v) => s.darkTheme = v.first,
+          ),
+        ),
         const _Header('Подсказки'),
         SwitchListTile(
           secondary: const Icon(Icons.auto_awesome),

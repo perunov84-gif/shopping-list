@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../suggestions/suggestion.dart';
 import '../suggestions/suggestion_engine.dart';
@@ -14,20 +13,26 @@ import '../monetization/ads.dart';
 import '../monetization/premium.dart';
 import '../state/lists_store.dart';
 import '../state/settings_store.dart';
+import 'theme.dart';
 import 'widgets/add_bar.dart';
 import 'widgets/new_list_sheet.dart';
+import 'widgets/share_sheet.dart';
 import 'widgets/suggestion_strip.dart';
 
 class ListScreen extends StatefulWidget {
-  const ListScreen({super.key, required this.listId});
+  const ListScreen({super.key, required this.listId, this.initialShopMode = false, this.receivedNotice = false});
   final int listId;
+
+  /// Присланный список открывается сразу в режиме «в магазине».
+  final bool initialShopMode;
+  final bool receivedNotice;
 
   @override
   State<ListScreen> createState() => _ListScreenState();
 }
 
 class _ListScreenState extends State<ListScreen> {
-  bool _shopMode = false;
+  late bool _shopMode = widget.initialShopMode;
   bool _assistantHidden = false;
   bool _preShopShown = false;
   List<Suggestion> _suggestions = const [];
@@ -39,7 +44,14 @@ class _ListScreenState extends State<ListScreen> {
   void initState() {
     super.initState();
     _store.addListener(_onStoreChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _onStoreChanged());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onStoreChanged();
+      if (widget.receivedNotice && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Вам прислали список покупок. Отмечайте купленное касанием ✓')),
+        );
+      }
+    });
   }
 
   @override
@@ -137,7 +149,7 @@ class _ListScreenState extends State<ListScreen> {
   Future<void> _menu(ShopList l, String action) async {
     switch (action) {
       case 'share':
-        await SharePlus.instance.share(ShareParams(text: l.toShareText(), subject: l.name));
+        await showShareSheet(context, l);
       case 'uncheck':
         await _store.uncheckAll(l);
       case 'clear':
@@ -208,7 +220,7 @@ class _ListScreenState extends State<ListScreen> {
         appBar: AppBar(
           titleSpacing: 0,
           title: Row(children: [
-            Icon(c.icon, color: c.color),
+            Icon(c.icon, color: c.tint(context)),
             const SizedBox(width: 10),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -223,10 +235,16 @@ class _ListScreenState extends State<ListScreen> {
           bottom: _shopMode
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(4),
-                  child: LinearProgressIndicator(value: l.progress, color: c.color, minHeight: 4),
+                  child: LinearProgressIndicator(value: l.progress, color: c.tint(context), minHeight: 4),
                 )
               : null,
           actions: [
+            if (!_shopMode && l.items.isNotEmpty)
+              IconButton(
+                tooltip: 'Отправить список',
+                icon: const Icon(Icons.send_outlined),
+                onPressed: () => showShareSheet(context, l),
+              ),
             if (_shopMode)
               TextButton.icon(
                 onPressed: () => setState(() => _shopMode = false),
@@ -236,7 +254,7 @@ class _ListScreenState extends State<ListScreen> {
             PopupMenuButton<String>(
               onSelected: (a) => _menu(l, a),
               itemBuilder: (_) => const [
-                PopupMenuItem(value: 'share', child: ListTile(leading: Icon(Icons.share_outlined), title: Text('Поделиться'))),
+                PopupMenuItem(value: 'share', child: ListTile(leading: Icon(Icons.send_outlined), title: Text('Отправить список'))),
                 PopupMenuItem(value: 'uncheck', child: ListTile(leading: Icon(Icons.restart_alt), title: Text('Снять все галочки'))),
                 PopupMenuItem(value: 'clear', child: ListTile(leading: Icon(Icons.playlist_remove), title: Text('Удалить купленное'))),
                 PopupMenuItem(value: 'dup', child: ListTile(leading: Icon(Icons.copy_outlined), title: Text('Повторить список'))),

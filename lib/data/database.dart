@@ -12,7 +12,7 @@ class AppDatabase {
   AppDatabase._(this.db);
 
   final Database db;
-  static const _version = 2;
+  static const _version = 3;
 
   static Future<AppDatabase> open({String? path}) async {
     final dbPath = path ?? p.join(await getDatabasesPath(), 'shopping_list.db');
@@ -26,7 +26,8 @@ class AppDatabase {
             name TEXT NOT NULL,
             category TEXT NOT NULL,
             created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL
+            updated_at INTEGER NOT NULL,
+            share_id TEXT
           )''');
         await db.execute('''
           CREATE TABLE items(
@@ -60,6 +61,7 @@ class AppDatabase {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) await _createHidden(db);
+        if (oldVersion < 3) await db.execute('ALTER TABLE lists ADD COLUMN share_id TEXT');
       },
       onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
     );
