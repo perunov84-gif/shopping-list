@@ -35,7 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final backup = BackupService(context.read<ListsStore>());
     try {
-      final res = await FilePicker.platform.pickFiles(type: FileType.any, withData: true);
+      final res = await FilePicker.pickFiles(type: FileType.any, withData: true);
       final bytes = res?.files.single.bytes;
       if (bytes == null) return;
       final n = await backup.importJson(bytes);

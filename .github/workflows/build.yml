@@ -55,7 +55,7 @@ jobs:
         run: |
           CACHE="${PUB_CACHE:-$HOME/.pub-cache}/hosted/pub.dev"
           mkdir -p /tmp/ci/pkgs
-          for p in flutter_rustore_pay yandex_mobileads speech_to_text google_mobile_ads in_app_purchase share_plus; do
+          for p in file_picker flutter_rustore_pay yandex_mobileads speech_to_text google_mobile_ads in_app_purchase share_plus; do
             d=$(ls -d "$CACHE"/$p-* 2>/dev/null | sort -V | tail -1)
             [ -z "$d" ] && continue
             mkdir -p /tmp/ci/pkgs/$p
