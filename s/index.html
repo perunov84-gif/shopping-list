@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Список покупок</title>
+<meta property="og:title" content="🛒 Вам прислали список покупок">
+<meta property="og:description" content="Нажмите, чтобы открыть список в приложении «Список покупок»">
+<style>
+  :root { --bg:#0d0d0f; --card:#1a1a1e; --line:#2a2a30; --text:#ededf0; --muted:#9a9aa3; --accent:#a259ff; --accent2:#d946ef; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:24px 16px 48px; }
+  .brand { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:14px; }
+  .brand b { color:#f7931e; letter-spacing:1px; }
+  h1 { font-size:24px; margin:18px 0 4px; }
+  .sub { color:var(--muted); margin:0 0 18px; }
+  .btn { display:block; width:100%; text-align:center; padding:15px 18px; border-radius:14px; border:0; font-size:17px; font-weight:600; text-decoration:none; cursor:pointer; }
+  .primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .ghost { background:transparent; color:var(--text); border:1px solid var(--line); margin-top:10px; }
+  ul { list-style:none; padding:0; margin:22px 0 0; background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+  li { display:flex; align-items:center; gap:14px; padding:14px 16px; border-top:1px solid var(--line); cursor:pointer; user-select:none; }
+  li:first-child { border-top:0; }
+  .box { width:26px; height:26px; border-radius:50%; border:2px solid var(--muted); flex:none; display:grid; place-items:center; font-size:15px; color:#fff; }
+  li.done .box { background:var(--accent); border-color:var(--accent); }
+  li.done .name { text-decoration:line-through; color:var(--muted); }
+  .qty { margin-left:auto; color:var(--muted); white-space:nowrap; }
+  .hint { color:var(--muted); font-size:13px; margin-top:14px; text-align:center; }
+  .err { background:var(--card); border-radius:16px; padding:20px; margin-top:24px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><img src="../ap-logo.svg" alt="AP" height="22"> · Список покупок</div>
+  <div id="app"><p class="sub">Загрузка…</p></div>
+</main>
+<script>
+(async function () {
+  const PKG = 'ru.perunov.shopping_list';
+  const DOWNLOAD = 'https://github.com/perunov84-gif/shopping-list/releases/latest';
+  const root = document.getElementById('app');
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let data = location.hash.slice(1);
+  if (data.startsWith('1.')) data = data.slice(2);
+
+  async function decode(b64) {
+    b64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return JSON.parse(await new Response(stream).text());
+  }
+
+  let list;
+  try { list = await decode(data); } catch (e) {
+    root.innerHTML = '<div class="err"><h1>Ссылка повреждена</h1><p class="sub">Попросите отправить список ещё раз.</p></div>';
+    return;
+  }
+
+  const appUrl = 'shoppinglist://list?d=' + encodeURIComponent(data);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const noApp = new URLSearchParams(location.search).get('app') === '0';
+  const fallback = location.origin + location.pathname + '?app=0' + location.hash;
+  const intentUrl = 'intent://list?d=' + encodeURIComponent(data) +
+    '#Intent;scheme=shoppinglist;package=' + PKG + ';S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end';
+  const openUrl = isAndroid ? intentUrl : appUrl;
+
+  const items = list.t || [];
+  const key = 'sl-' + (list.id || data.slice(0, 16));
+  let done = {};
+  try { done = JSON.parse(localStorage.getItem(key) || '{}'); } catch (_) {}
+
+  root.innerHTML =
+    '<h1>' + esc(list.n || 'Список покупок') + '</h1>' +
+    '<p class="sub">' + items.length + ' поз. · вам прислали список покупок</p>' +
+    '<a class="btn primary" href="' + esc(openUrl) + '">Открыть в приложении</a>' +
+    '<a class="btn ghost" href="' + DOWNLOAD + '">' + (noApp ? 'Установить приложение' : 'Нет приложения? Установить') + '</a>' +
+    '<ul id="items">' + items.map((t, i) =>
+      '<li data-i="' + i + '" class="' + (done[i] ? 'done' : '') + '"><span class="box">' + (done[i] ? '✓' : '') +
+      '</span><span class="name">' + esc(t[0]) + '</span>' + (t[1] ? '<span class="qty">' + esc(t[1]) + '</span>' : '') + '</li>'
+    ).join('') + '</ul>' +
+    '<p class="hint">Можно отмечать покупки прямо здесь, но в приложении удобнее.</p>';
+
+  document.getElementById('items').addEventListener('click', e => {
+    const li = e.target.closest('li'); if (!li) return;
+    const i = li.dataset.i; done[i] = !done[i];
+    li.classList.toggle('done', !!done[i]); li.querySelector('.box').textContent = done[i] ? '✓' : '';
+    try { localStorage.setItem(key, JSON.stringify(done)); } catch (_) {}
+  });
+
+  // Сразу пробуем открыть приложение (Android). Если его нет — браузер вернётся сюда с ?app=0.
+  if (isAndroid && !noApp) setTimeout(() => { location.href = intentUrl; }, 50);
+})();
+</script>
+</body>
+</html>
