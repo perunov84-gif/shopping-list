@@ -35,9 +35,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final backup = BackupService(context.read<ListsStore>());
     try {
-      final res = await FilePicker.pickFiles(type: FileType.any, withData: true);
-      final bytes = res?.files.single.bytes;
-      if (bytes == null) return;
+      final file = await FilePicker.pickFile();
+      if (file == null) return;
+      final bytes = await file.readAsBytes();
       final n = await backup.importJson(bytes);
       messenger.showSnackBar(SnackBar(content: Text('Восстановлено списков: $n')));
     } catch (e) {
