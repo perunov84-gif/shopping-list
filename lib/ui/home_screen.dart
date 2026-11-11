@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _quickVoice(BuildContext context) async {
     final text = await showVoiceSheet(context,
-        hint: 'Скажите, например:\n«В строительный гвозди и молоток, в аптеку пластырь»');
+        hint: 'Скажите, например:\n«Для ремонта гвозди и молоток, в аптеку пластырь»');
     if (text == null || text.trim().isEmpty || !context.mounted) return;
     final router = VoiceRouter(context.read<ListsStore>(), context.read<Catalog>());
     final res = await router.route(text);

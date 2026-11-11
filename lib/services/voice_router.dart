@@ -4,7 +4,7 @@ import '../models/shop_list.dart';
 import '../models/store_category.dart';
 import '../state/lists_store.dart';
 
-/// «Быстрая фраза» с главного экрана: «в строительный гвозди и молоток, в аптеку пластырь».
+/// «Быстрая фраза» с главного экрана: «для ремонта гвозди и молоток, в аптеку пластырь».
 /// Сам определяет магазин(ы) и раскладывает товары по подходящим спискам.
 class VoiceRouter {
   VoiceRouter(this.store, this.catalog);
