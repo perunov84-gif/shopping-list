@@ -107,7 +107,7 @@ class _ShareSheetState extends State<_ShareSheet> {
           Text(
             'Получатель нажмёт на ссылку — и сразу увидит список в приложении. '
             'Если приложения нет, список откроется в браузере.',
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.justify,
             style: t.textTheme.bodySmall,
           ),
           const SizedBox(height: 20),
@@ -140,14 +140,12 @@ class _ShareSheetState extends State<_ShareSheet> {
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             _TargetButton(
               label: 'Telegram',
-              color: const Color(0xFF229ED9),
-              icon: Icons.telegram,
+              image: 'assets/images/telegram.png',
               onTap: _busy ? null : () => _send(_Target.telegram),
             ),
             _TargetButton(
               label: 'WhatsApp',
-              color: const Color(0xFF25D366),
-              icon: Icons.phone, // белая трубка на зелёном
+              image: 'assets/images/whatsapp.png',
               onTap: _busy ? null : () => _send(_Target.whatsapp),
             ),
             _TargetButton(
@@ -164,22 +162,32 @@ class _ShareSheetState extends State<_ShareSheet> {
 }
 
 class _TargetButton extends StatelessWidget {
-  const _TargetButton({required this.label, required this.color, required this.icon, required this.onTap});
+  const _TargetButton({required this.label, this.color, this.icon, this.image, required this.onTap});
   final String label;
-  final Color color;
-  final IconData icon;
+  final Color? color;
+  final IconData? icon;
+
+  /// Готовый круглый значок (Telegram, WhatsApp); иначе — [icon] в круге цвета [color].
+  final String? image;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Material(
-        color: color,
+        color: image == null ? color : Colors.transparent,
         shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onTap,
-          child: SizedBox(width: 64, height: 64, child: Icon(icon, color: Colors.white, size: 32)),
+          child: SizedBox(
+            width: 64,
+            height: 64,
+            child: image != null
+                ? Image.asset(image!, width: 64, height: 64, filterQuality: FilterQuality.high)
+                : Icon(icon, color: Colors.white, size: 30),
+          ),
         ),
       ),
       const SizedBox(height: 6),

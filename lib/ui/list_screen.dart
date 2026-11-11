@@ -264,11 +264,18 @@ class _ListScreenState extends State<ListScreen> {
           ],
         ),
         body: _shopMode ? _ShopModeBody(list: l, onToggle: (i) => _toggleInShop(l, i)) : _editBody(l),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: !_shopMode && l.items.isNotEmpty
-            ? FloatingActionButton.extended(
-                onPressed: () => _enterShopMode(l),
-                icon: const Icon(Icons.shopping_cart_checkout),
-                label: const Text('В магазин'),
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FloatingActionButton.extended(
+                    onPressed: () => _enterShopMode(l),
+                    icon: const Icon(Icons.shopping_cart_checkout),
+                    label: const Text('В магазин'),
+                  ),
+                ),
               )
             : null,
         // В режиме магазина рекламы нет — ничего не должно мешать сверяться со списком.
