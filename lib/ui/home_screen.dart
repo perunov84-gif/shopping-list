@@ -134,7 +134,11 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/basket.png', width: 120, height: 120, color: t.colorScheme.primary),
+            Image.asset(
+              t.brightness == Brightness.dark ? 'assets/images/basket_dark.png' : 'assets/images/basket_light.png',
+              width: 120,
+              height: 120,
+            ),
             const SizedBox(height: 16),
             Text('Пока нет списков', style: t.textTheme.headlineSmall),
             const SizedBox(height: 8),
