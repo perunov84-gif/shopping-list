@@ -39,5 +39,6 @@ flutter:
   assets:
     - assets/data/catalog.json
     - assets/images/splash_logo.png
+    - assets/images/basket.png
     - assets/images/telegram.png
     - assets/images/whatsapp.png

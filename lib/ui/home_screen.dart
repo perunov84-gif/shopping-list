@@ -16,6 +16,7 @@ import 'theme.dart';
 import 'widgets/new_list_sheet.dart';
 import 'widgets/share_sheet.dart';
 import 'widgets/voice_sheet.dart';
+import 'widgets/wide_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -76,7 +77,7 @@ class HomeScreen extends StatelessWidget {
           if (!premium.isVip)
             IconButton(
               tooltip: 'VIP без рекламы',
-              icon: const Icon(Icons.workspace_premium_outlined),
+              icon: const Icon(Icons.star_rounded),
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen())),
             ),
           IconButton(
@@ -96,7 +97,7 @@ class HomeScreen extends StatelessWidget {
           : lists.isEmpty
               ? _EmptyState(onCreate: () => _create(context), onVoice: () => _quickVoice(context))
               : ListView.builder(
-                  padding: const EdgeInsets.only(top: 4, bottom: 96),
+                  padding: const EdgeInsets.only(top: 4, bottom: 170),
                   itemCount: lists.length,
                   itemBuilder: (_, i) => _ListCard(list: lists[i], onOpen: () => _openList(context, lists[i])),
                 ),
@@ -107,24 +108,10 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  FloatingActionButton.small(
-                    heroTag: 'voice',
-                    tooltip: 'Добавить голосом',
-                    onPressed: () => _quickVoice(context),
-                    child: const Icon(Icons.mic_none),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FloatingActionButton.extended(
-                      heroTag: 'new',
-                      onPressed: () => _create(context),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Новый список'),
-                    ),
-                  ),
+                  WideButton(icon: Icons.add, label: 'Новый список', onPressed: () => _create(context)),
+                  const SizedBox(height: 10),
+                  WideButton(icon: Icons.mic_none, label: 'Надиктовать', onPressed: () => _quickVoice(context)),
                 ],
               ),
             ),
@@ -147,7 +134,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.shopping_basket_outlined, size: 96, color: t.colorScheme.primary),
+            Image.asset('assets/images/basket.png', width: 120, height: 120, color: t.colorScheme.primary),
             const SizedBox(height: 16),
             Text('Пока нет списков', style: t.textTheme.headlineSmall),
             const SizedBox(height: 8),
@@ -158,9 +145,9 @@ class _EmptyState extends StatelessWidget {
               style: t.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
-            FilledButton.icon(onPressed: onCreate, icon: const Icon(Icons.add), label: const Text('Создать список')),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(onPressed: onVoice, icon: const Icon(Icons.mic_none), label: const Text('Надиктовать')),
+            WideButton(icon: Icons.add, label: 'Создать список', onPressed: onCreate),
+            const SizedBox(height: 10),
+            WideButton(icon: Icons.mic_none, label: 'Надиктовать', onPressed: onVoice),
           ],
         ),
       ),

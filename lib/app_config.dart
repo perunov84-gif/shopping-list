@@ -12,6 +12,9 @@ class AppConfig {
   /// ID разового продукта «VIP навсегда» (должен совпадать с консолью магазина).
   static const vipProductId = String.fromEnvironment('VIP_PRODUCT_ID', defaultValue: 'vip_forever');
 
+  /// Цена VIP, если магазин ещё не вернул свою (реальная цена задаётся в консоли магазина).
+  static const vipFallbackPrice = '100 ₽';
+
   // ---- Реклама. По умолчанию — официальные тестовые/демо ID, безопасные для разработки. ----
   static const admobBannerId =
       String.fromEnvironment('ADMOB_BANNER_ID', defaultValue: 'ca-app-pub-3940256099942544/9214589741');

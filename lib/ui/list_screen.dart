@@ -18,6 +18,7 @@ import 'widgets/add_bar.dart';
 import 'widgets/new_list_sheet.dart';
 import 'widgets/share_sheet.dart';
 import 'widgets/suggestion_strip.dart';
+import 'widgets/wide_button.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({super.key, required this.listId, this.initialShopMode = false, this.receivedNotice = false});
@@ -268,13 +269,10 @@ class _ListScreenState extends State<ListScreen> {
         floatingActionButton: !_shopMode && l.items.isNotEmpty
             ? Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: FloatingActionButton.extended(
-                    onPressed: () => _enterShopMode(l),
-                    icon: const Icon(Icons.shopping_cart_checkout),
-                    label: const Text('В магазин'),
-                  ),
+                child: WideButton(
+                  icon: Icons.shopping_cart_checkout,
+                  label: 'В магазин',
+                  onPressed: () => _enterShopMode(l),
                 ),
               )
             : null,

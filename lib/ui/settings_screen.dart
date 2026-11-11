@@ -55,9 +55,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(children: [
         Card(
           child: ListTile(
-            leading: Icon(Icons.workspace_premium, color: t.colorScheme.primary),
+            leading: Icon(Icons.star_rounded, color: t.colorScheme.primary),
             title: Text(p.isVip ? 'VIP активен' : 'VIP: без рекламы'),
-            subtitle: Text(p.isVip ? 'Спасибо за поддержку!' : 'Разовая покупка, навсегда'),
+            subtitle: Text(p.isVip ? 'Спасибо за поддержку!' : 'Всего ${p.price ?? AppConfig.vipFallbackPrice}, навсегда'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen())),
           ),
