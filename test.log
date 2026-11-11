@@ -1,0 +1,24 @@
+
+::group::✅ Passing tests
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: comma separated with quantities
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: voice phrase without commas
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: adjective is kept
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: unknown product becomes single item
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: multi-word product
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: decimal comma is not a separator
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: trailing details belong to previous product
+✅ /home/runner/work/shopping-list/shopping-list/test/input_parser_test.dart: stemmer
+✅ /home/runner/work/shopping-list/shopping-list/test/catalog_test.dart: assistant knows that nails need a hammer
+✅ /home/runner/work/shopping-list/shopping-list/test/catalog_test.dart: every category has items except "other"
+✅ /home/runner/work/shopping-list/shopping-list/test/catalog_test.dart: category detection by product
+✅ /home/runner/work/shopping-list/shopping-list/test/catalog_test.dart: real voice phrase with catalog
+✅ /home/runner/work/shopping-list/shopping-list/test/catalog_test.dart: hardware phrase
+✅ /home/runner/work/shopping-list/shopping-list/test/catalog_test.dart: autocomplete
+✅ /home/runner/work/shopping-list/shopping-list/test/smoke_test.dart: smoke
+✅ /home/runner/work/shopping-list/shopping-list/test/share_link_test.dart: round trip through https link
+✅ /home/runner/work/shopping-list/shopping-list/test/share_link_test.dart: custom scheme link
+✅ /home/runner/work/shopping-list/shopping-list/test/share_link_test.dart: foreign links are ignored
+✅ /home/runner/work/shopping-list/shopping-list/test/share_link_test.dart: link stays short for a typical list
+::endgroup::
+
+🎉 19 tests passed.

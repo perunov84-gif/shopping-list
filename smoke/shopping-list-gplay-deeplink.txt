@@ -1,0 +1,7 @@
+Starting: Intent { act=android.intent.action.VIEW dat=shoppinglist://list/... pkg=ru.perunov.shopping_list }
+Status: ok
+LaunchState: WARM
+Activity: ru.perunov.shopping_list/.MainActivity
+TotalTime: 3244
+WaitTime: 3271
+Complete

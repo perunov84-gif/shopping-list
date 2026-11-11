@@ -1,0 +1,8 @@
+Starting: Intent { act=android.intent.action.VIEW dat=shoppinglist://list/... pkg=ru.perunov.shopping_list }
+Warning: Activity not started, intent has been delivered to currently running top-most instance.
+Status: ok
+LaunchState: UNKNOWN (0)
+Activity: ru.perunov.shopping_list/.MainActivity
+TotalTime: 0
+WaitTime: 95
+Complete
