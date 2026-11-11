@@ -13,7 +13,7 @@ class VoiceRouter {
 
   static const _keywords = <StoreCategory, List<String>>{
     StoreCategory.grocery: ['продукт', 'супермаркет', 'магнит', 'пят', 'ашан', 'перекрест', 'еда', 'еды', 'гипермаркет'],
-    StoreCategory.hardware: ['строител', 'стройк', 'ремонт', 'строймаг', 'леруа', 'петрович', 'ремонт', 'оби'],
+    StoreCategory.hardware: ['строител', 'стройк', 'строймаг', 'леруа', 'петрович', 'ремонт', 'оби'],
     StoreCategory.household: ['хоз', 'бытов', 'химия', 'химию', 'химии'],
     StoreCategory.pharmacy: ['аптек', 'лекарств'],
     StoreCategory.pets: ['зоо', 'питом'],

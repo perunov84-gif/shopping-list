@@ -147,7 +147,7 @@ class _ShareSheetState extends State<_ShareSheet> {
             _TargetButton(
               label: 'WhatsApp',
               color: const Color(0xFF25D366),
-              icon: Icons.whatsapp,
+              icon: Icons.phone, // белая трубка на зелёном
               onTap: _busy ? null : () => _send(_Target.whatsapp),
             ),
             _TargetButton(
