@@ -75,6 +75,23 @@
         <intent>
             <action android:name="android.speech.RecognitionService"/>
         </intent>
+        <!-- «Отправить в Telegram / WhatsApp» -->
+        <package android:name="org.telegram.messenger"/>
+        <package android:name="org.telegram.messenger.web"/>
+        <package android:name="com.whatsapp"/>
+        <package android:name="com.whatsapp.w4b"/>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="tg"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="whatsapp"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

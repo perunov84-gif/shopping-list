@@ -60,7 +60,9 @@ class _ListSheetState extends State<_ListSheet> {
     final t = Theme.of(context);
     final isEdit = widget.editing != null;
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+      // клавиатура + системная панель навигации (Android 15 рисует приложение под ней)
+      padding: EdgeInsets.fromLTRB(
+          16, 0, 16, MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).viewPadding.bottom + 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

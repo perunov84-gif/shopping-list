@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// Типы магазинов. [key] хранится в БД — не менять у существующих значений.
 enum StoreCategory {
   grocery('grocery', 'Продукты', Icons.local_grocery_store_outlined, Color(0xFF43A047)),
-  hardware('hardware', 'Строительный', Icons.construction_outlined, Color(0xFFEF6C00)),
+  hardware('hardware', 'Ремонт', Icons.construction_outlined, Color(0xFFEF6C00)),
   household('household', 'Хозтовары', Icons.cleaning_services_outlined, Color(0xFF1E88E5)),
   pharmacy('pharmacy', 'Аптека', Icons.medical_services_outlined, Color(0xFFE53935)),
   pets('pets', 'Зоотовары', Icons.pets_outlined, Color(0xFF8D6E63)),

@@ -26,6 +26,8 @@ for apk in dist/shopping-list-gplay.apk dist/shopping-list-rustore.apk; do
   adb shell am start -W -a android.intent.action.VIEW -d "shoppinglist://list?d=$D" "$PKG" > "$OUT/$name-deeplink.txt" 2>&1
   sleep 6
   adb exec-out screencap -p > "$OUT/$name-4-deeplink.png"
+  adb shell input keyevent 4; sleep 2              # назад: список открыт в режиме редактирования? выходим на главный
+  adb exec-out screencap -p > "$OUT/$name-5-home.png"
   adb shell pidof "$PKG" > "$OUT/$name-pid.txt" 2>&1 || echo "NOT RUNNING" > "$OUT/$name-pid.txt"
   adb logcat -d -v brief > "$OUT/$name-logcat-full.txt" 2>&1
   grep -n "FATAL EXCEPTION" -A40 "$OUT/$name-logcat-full.txt" > "$OUT/$name-crash.txt" || true

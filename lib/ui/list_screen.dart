@@ -242,7 +242,7 @@ class _ListScreenState extends State<ListScreen> {
             if (!_shopMode && l.items.isNotEmpty)
               IconButton(
                 tooltip: 'Отправить список',
-                icon: const Icon(Icons.send_outlined),
+                icon: const Icon(Icons.share_outlined),
                 onPressed: () => showShareSheet(context, l),
               ),
             if (_shopMode)
@@ -254,7 +254,7 @@ class _ListScreenState extends State<ListScreen> {
             PopupMenuButton<String>(
               onSelected: (a) => _menu(l, a),
               itemBuilder: (_) => const [
-                PopupMenuItem(value: 'share', child: ListTile(leading: Icon(Icons.send_outlined), title: Text('Отправить список'))),
+                PopupMenuItem(value: 'share', child: ListTile(leading: Icon(Icons.share_outlined), title: Text('Отправить список'))),
                 PopupMenuItem(value: 'uncheck', child: ListTile(leading: Icon(Icons.restart_alt), title: Text('Снять все галочки'))),
                 PopupMenuItem(value: 'clear', child: ListTile(leading: Icon(Icons.playlist_remove), title: Text('Удалить купленное'))),
                 PopupMenuItem(value: 'dup', child: ListTile(leading: Icon(Icons.copy_outlined), title: Text('Повторить список'))),

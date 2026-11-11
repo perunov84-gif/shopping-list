@@ -100,26 +100,33 @@ class HomeScreen extends StatelessWidget {
                   itemCount: lists.length,
                   itemBuilder: (_, i) => _ListCard(list: lists[i], onOpen: () => _openList(context, lists[i])),
                 ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: lists.isEmpty
           ? null
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                FloatingActionButton.small(
-                  heroTag: 'voice',
-                  tooltip: 'Добавить голосом',
-                  onPressed: () => _quickVoice(context),
-                  child: const Icon(Icons.mic_none),
-                ),
-                const SizedBox(height: 12),
-                FloatingActionButton.extended(
-                  heroTag: 'new',
-                  onPressed: () => _create(context),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Новый список'),
-                ),
-              ],
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  FloatingActionButton.small(
+                    heroTag: 'voice',
+                    tooltip: 'Добавить голосом',
+                    onPressed: () => _quickVoice(context),
+                    child: const Icon(Icons.mic_none),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FloatingActionButton.extended(
+                      heroTag: 'new',
+                      onPressed: () => _create(context),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Новый список'),
+                    ),
+                  ),
+                ],
+              ),
             ),
       bottomNavigationBar: AdBanner(premium: premium),
     );
@@ -173,7 +180,7 @@ class _ListCard extends StatelessWidget {
       showDragHandle: true,
       builder: (ctx) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(leading: const Icon(Icons.send_outlined), title: const Text('Отправить список'), subtitle: const Text('Ссылкой в Telegram, WhatsApp…'), onTap: () => Navigator.pop(ctx, 'share')),
+          ListTile(leading: const Icon(Icons.share_outlined), title: const Text('Отправить список'), subtitle: const Text('Ссылкой в Telegram, WhatsApp…'), onTap: () => Navigator.pop(ctx, 'share')),
           ListTile(leading: const Icon(Icons.edit_outlined), title: const Text('Переименовать'), onTap: () => Navigator.pop(ctx, 'rename')),
           ListTile(leading: const Icon(Icons.copy_outlined), title: const Text('Повторить список'), subtitle: const Text('Копия без галочек'), onTap: () => Navigator.pop(ctx, 'dup')),
           ListTile(

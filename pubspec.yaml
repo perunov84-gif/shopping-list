@@ -24,6 +24,8 @@ dependencies:
   file_picker: any
   # Открытие присланных списков по ссылке
   app_links: any
+  # Открытие Telegram / WhatsApp напрямую
+  url_launcher: any
   # Покупки: RuStore Pay SDK
   flutter_rustore_pay: ^11.2.0
 

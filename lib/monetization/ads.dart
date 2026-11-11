@@ -186,12 +186,16 @@ class _AdBannerState extends State<AdBanner> {
     super.dispose();
   }
 
+  /// Пустое место высотой с системную панель навигации: без него Scaffold считает,
+  /// что нижняя панель (баннер) сама учитывает отступ, и подсказки уходят под системный трей.
+  static const _navBarSpacer = SafeArea(top: false, child: SizedBox(width: double.infinity));
+
   @override
   Widget build(BuildContext context) {
-    if (widget.premium.isVip) return const SizedBox.shrink();
+    if (widget.premium.isVip) return _navBarSpacer;
     final g = _g;
     if (g != null) {
-      if (!_loaded) return const SizedBox.shrink();
+      if (!_loaded) return _navBarSpacer;
       return SafeArea(
         top: false,
         child: SizedBox(width: g.size.width.toDouble(), height: g.size.height.toDouble(), child: gma.AdWidget(ad: g)),
@@ -205,6 +209,6 @@ class _AdBannerState extends State<AdBanner> {
         child: ya.AdWidget(bannerAd: y),
       );
     }
-    return const SizedBox.shrink();
+    return _navBarSpacer;
   }
 }

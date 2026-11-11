@@ -94,6 +94,7 @@ ThemeData _base(ColorScheme scheme) => ThemeData(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(28), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       ),
+      snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
       chipTheme: ChipThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: scheme.primary,
